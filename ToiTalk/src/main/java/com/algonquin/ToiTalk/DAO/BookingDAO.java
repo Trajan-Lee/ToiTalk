@@ -20,32 +20,29 @@ public class BookingDAO {
 		List<Booking> bookList = new ArrayList<>();
 		
 		//TODO test this for wildcare functionality
-	    String sql = "SELECT * FROM bookings"
-	    		   + "WHERE booking_id = ?"
-	    		   + "AND student_id = ?"
-	    		   + "AND tutor_id = ?";
-	    try {
-	    	PreparedStatement statement = connection.prepareStatement(sql);
+		String sql = "SELECT * FROM bookings "
+				+ "WHERE booking_id LIKE ? "
+				+ "AND student_id LIKE ? "
+				+ "AND tutor_id LIKE ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)){
 			//add wildcare to ID if null
 			if (bookingID != null) {
 				statement.setInt(1, bookingID);
 			} else {
-				String bID = String.valueOf(bookingID);
-				statement.setString(1, bID);
+				statement.setString(1, "%");
 			}
 			
 			if (studentID != null) {
 				statement.setInt(2, studentID);
 			} else {
-				String sID = String.valueOf(studentID);
-				statement.setString(2, sID);
+				statement.setString(2, "%");
 			}
 			
 			if (tutorID != null) {
 				statement.setInt(3, tutorID);
 			} else {
-				String tID = String.valueOf(tutorID);
-				statement.setString(3, tID);
+				statement.setString(3, "%");
 			}
 
 			ResultSet rs = statement.executeQuery();
@@ -56,7 +53,7 @@ public class BookingDAO {
 				tutorName = userDAO.getTutorNameByID(rs.getInt("tutor_id"));
 				studentName = userDAO.getStudentNameByID(rs.getInt("student_id"));
 				Booking book = new Booking(rs.getInt("booking_id"), rs.getInt("tutor_id"), rs.getInt("student_id")
-						, tutorName, studentName, rs.getTimestamp("date"), rs.getString("status"));
+						, rs.getInt("tutor_schedule_id"), tutorName, studentName, rs.getTimestamp("date"), rs.getString("status"));
 				bookList.add(book);
 			}
 		} catch (SQLException e) {
@@ -65,5 +62,72 @@ public class BookingDAO {
 		}
 		
 	    return bookList;
+	}
+	
+    public boolean addBooking(Booking booking) {
+        String sql = "INSERT INTO bookings (tutor_id, student_id, tutor_schedule_id, date, status) VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, booking.getTutorID());
+            statement.setInt(2, booking.getStudentID());
+            statement.setInt(3, booking.getScheduleID());
+            statement.setTimestamp(4, booking.getDate()); // Assuming date is a java.util.Date
+            statement.setString(5, booking.getStatus());
+
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Failed to add booking: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateBooking(Booking booking) {
+        String sql = "UPDATE bookings SET tutor_id = ?, student_id = ?, tutor_schedule_id = ?, date = ?, status = ? WHERE booking_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, booking.getTutorID());
+            statement.setInt(2, booking.getStudentID());
+            statement.setInt(3, booking.getScheduleID());
+            statement.setTimestamp(4, booking.getDate());
+            statement.setString(5, booking.getStatus());
+            statement.setInt(6, booking.getBookingID());
+
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Failed to update booking: " + e.getMessage());
+            return false;
+        }
+    }
+	
+    public boolean deleteBooking(int bookingId) {
+        String sql = "DELETE FROM bookings WHERE booking_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, bookingId);
+
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Failed to delete booking: " + e.getMessage());
+            return false;
+        }
+    }
+	
+	public boolean changeBookingStatus(int bookingID, String status) {
+		String sql = "UPDATE bookings"
+				+ "SET status = ?"
+				+ "WHERE booking_id = ?";
+		
+	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+	    	statement.setString(1, status);
+	    	statement.setInt(2, bookingID);
+	    	return true;
+	    	
+	    } catch (SQLException e) {
+	    	e.printStackTrace();
+	    	return false;
+	    }
 	}
 }

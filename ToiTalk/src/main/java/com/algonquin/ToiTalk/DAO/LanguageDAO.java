@@ -44,11 +44,12 @@ public class LanguageDAO {
 		List<Language> matchLang;
 		List<Language> allLang = loadLang();
 		
-		String sql = "SELECT * FROM tutor_languages LEFT JOIN languages"
-				   + "ON tutor_languages.language_id = languages.language_id"
-				   + "WHERE tutor_id = ?";
-	   try {
-		   PreparedStatement statement = connection.prepareStatement(sql);
+		String sql = "SELECT * FROM tutor_languages "
+				+ "LEFT JOIN languages "
+				+ "ON tutor_languages.language_id = languages.language_id "
+				+ "WHERE tutor_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)){
 		   statement.setInt(1, tutorID);
 		   ResultSet rs = statement.executeQuery();
 		   while (rs.next()) {

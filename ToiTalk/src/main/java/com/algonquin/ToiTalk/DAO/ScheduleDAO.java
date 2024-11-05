@@ -26,6 +26,18 @@ public class ScheduleDAO {
         dayToIntMap.put("Saturday", 5);
         dayToIntMap.put("Sunday", 6);
     }
+    
+    private static final Map<Integer, String> intToDayMap;
+    static {
+        intToDayMap = new HashMap<>();
+        intToDayMap.put(0, "Monday");
+        intToDayMap.put(1, "Tuesday");
+        intToDayMap.put(2, "Wednesday");
+        intToDayMap.put(3, "Thursday");
+        intToDayMap.put(4, "Friday");
+        intToDayMap.put(5, "Saturday");
+        intToDayMap.put(6, "Sunday");
+    }
 	private Integer DayConverter(String Day) {
 		return dayToIntMap.get(Day);
 	}
@@ -35,22 +47,25 @@ public class ScheduleDAO {
 	}
 	
 	public Schedule loadSchedule(int tutorID) {
-		boolean schedule[][] = new boolean[7][24];
+		String schedule[][] = new String[7][24];
 		
 
-        String sql = "SELECT * FROM tutor_schedule LEFT JOIN time_slots"
-        		   + "ON tutor_schedule.slot_id = slots.slot_id"
-        		   + "WHERE tutor_slot.tutor_id = ?";
-	    try {
-	        PreparedStatement statement = connection.prepareStatement(sql);
+		String sql = "SELECT * FROM tutor_schedule "
+				+ "LEFT JOIN time_slots "
+				+ "ON tutor_schedule.slot_id = time_slots.slot_id "
+				+ "WHERE tutor_schedule.tutor_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)){
 	        statement.setInt(1, tutorID);
 	        ResultSet rs = statement.executeQuery();
 	        int iDay;
 	        int iHour;
+	        String sStatus;
 			while (rs.next()) {
 				iDay = DayConverter(rs.getString("day"));
 				iHour = rs.getInt("hour");
-				schedule[iDay][iHour] = true;
+				sStatus = rs.getString("status");
+				schedule[iDay][iHour] = sStatus;
 			}
 		} catch (SQLException e) {
     		e.printStackTrace();
@@ -59,4 +74,87 @@ public class ScheduleDAO {
 		
 		return new Schedule(tutorID, schedule);
 	}
+	
+	//Will be run every time an update is performed. Essentially, wipes the schedule and then rebuilds it in DB
+	public boolean deleteSchedule(int tutorID) {
+		
+		String sql = "DELETE * FROM tutor_schedule "
+				+ "WHERE tutor_id = ?";
+		
+        try (PreparedStatement statement = connection.prepareStatement(sql)){
+        	statement.setInt(1, tutorID);
+        	statement.executeUpdate();
+        	return true;
+        } catch (SQLException e) {
+        	e.printStackTrace();
+        	System.out.println("Error deleting schedule" + e.getMessage());
+        	return false;
+        }
+	}
+	
+	public boolean addSchedule(Schedule schedule) {
+	    String[][] inSchedule = schedule.getSchedule();
+	    int tutorID = schedule.getTutorID();
+
+	    String sql = "INSERT INTO tutor_schedule (tutor_id, slot_id, status) VALUES (?, ?, ?)";
+
+	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+	        statement.setInt(1, tutorID);
+	        int slotID;
+
+	        for (int day = 0; day < 7; day++) {
+	            for (int hour = 0; hour < 24; hour++) {
+	                if (inSchedule[day][hour] != null) {
+	                    slotID = day * 24 + hour + 1;
+	                    statement.setInt(2, slotID);
+	                    statement.setString(3, inSchedule[day][hour]);
+	                    statement.addBatch(); // Add to batch instead of executing immediately
+	                }
+	            }
+	        }
+	        statement.executeBatch(); // Execute all at once
+	        return true;
+	    } catch (SQLException e) {
+	    	e.printStackTrace();
+	        System.out.println("Failed to add schedule: " + e.getMessage());
+	        return false;
+	    }
+	}
+	
+	public boolean changeScheduleStatus(int tutorID, int day, int hour, String status) {
+		
+		String sql = "UPDATE tutor_schedule"
+				+ "SET status = ?"
+				+ "WHERE tutor_id = ?"
+				+ "AND slot_id = ?";
+		int slotID =  day * 24 + hour + 1;
+		
+	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+	    	statement.setString(1, status);
+	    	statement.setInt(2, tutorID);
+	    	statement.setInt(3, slotID);
+	    	return true;
+	    	
+	    } catch (SQLException e) {
+	    	e.printStackTrace();
+	    	return false;
+	    }
+	}
+	
+	public boolean changeScheduleStatus(int tutorScheduleID, String status) {
+		String sql = "UPDATE tutor_schedule"
+				+ "SET status = ?"
+				+ "WHERE tutor_schedule_id = ?";
+		
+	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+	    	statement.setString(1, status);
+	    	statement.setInt(2, tutorScheduleID);
+	    	return true;
+	    	
+	    } catch (SQLException e) {
+	    	e.printStackTrace();
+	    	return false;
+	    }
+	}
+	
 }
