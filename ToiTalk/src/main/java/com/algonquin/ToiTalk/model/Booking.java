@@ -6,25 +6,26 @@ public class Booking {
 	
 	//TODO WHEN MAKING NEW BOOKING, CHANGE STATUS IN TUTOR_SCHEDULE
 	//TODO FIGURE OUT HOW TO USE TIMESLOT ID
+	//TODO next iteration we will implement a table of recurring bookings
 	
 	
 	
 	private int bookingID;
 	private int tutorID;
 	private int studentID;
-	private int scheduleID;
+	private int slotID;
 	private String tutorName;
 	private String studentName;
 	private Timestamp date;
 	private String status;
 	
 	
-	public Booking(int bookingID, int tutorID, int studentID, int scheduleID, String tutorName
+	public Booking(int bookingID, int tutorID, int studentID, int slotID, String tutorName
 			, String studentName, Timestamp date,String status) {
 		this.bookingID = bookingID;
 		this.tutorID = tutorID;
 		this.studentID = studentID;
-		this.scheduleID = scheduleID;
+		this.slotID = slotID;
 		this.tutorName = tutorName;
 		this.studentName = studentName;
 		this.date = date;
@@ -77,12 +78,12 @@ public class Booking {
 		this.status = status;
 	}
 
-	public int getScheduleID() {
-		return scheduleID;
+	public int getSlotID() {
+		return slotID;
 	}
 
-	public void setScheduleID(int scheduleID) {
-		this.scheduleID = scheduleID;
+	public void setSlotID(int scheduleID) {
+		this.slotID = scheduleID;
 	}
 	
 	

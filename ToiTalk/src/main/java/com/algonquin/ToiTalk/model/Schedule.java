@@ -5,13 +5,13 @@ public class Schedule {
 	// schedule[day][hour]
 	// week starts at monday = 0, hour starts at midnight = 0
 	private int tutorID;
-	private String[][] schedule;
+	private String[][] arrSchedule;
 	public Schedule(int ID, String [][] schedule) {
 		this.tutorID = ID;
 		if (schedule != null) {
-			this.schedule = schedule;
+			this.arrSchedule = schedule;
 		} else {
-			this.schedule = new String[7][24]; //automatically init to false
+			this.arrSchedule = new String[7][24]; //automatically init to false
 		}
 	}
 	
@@ -24,11 +24,11 @@ public class Schedule {
 		this.tutorID = tutorID;
 	}
 	
-	public String[][] getSchedule() {
-		return schedule;
+	public String[][] getArrSchedule() {
+		return arrSchedule;
 	}
-	public void setSchedule(String[][] schedule) {
-		this.schedule = schedule;
+	public void setArrSchedule(String[][] schedule) {
+		this.arrSchedule = schedule;
 	}
 
 }

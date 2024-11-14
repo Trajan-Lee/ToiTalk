@@ -11,17 +11,17 @@ public class Tutor extends User {
 	private List<Language> languages;
 	private String bio;
 	private float rating;
-	private int expyears;
+	private int expYears;
 	private Schedule schedule;
 	
 	public Tutor(String username, String password, String email, String type, int ID, Timestamp create_time,
-		int tutorID, List<Language> languages, String bio, float rating, int expyears, Schedule schedule) {
+		int tutorID, List<Language> languages, String bio, float rating, int expYears, Schedule schedule) {
 		super(username, password, email, type, ID, create_time);
 		this.tutorID = tutorID;
 		this.languages = languages;
 		this.bio = bio;
 		this.rating = rating;
-		this.expyears = expyears;
+		this.expYears = expYears;
 		this.schedule = schedule;
 	}
 
@@ -59,12 +59,12 @@ public class Tutor extends User {
 		this.rating = rating;
 	}
 
-	public int getExpyears() {
-		return expyears;
+	public int getExpYears() {
+		return expYears;
 	}
 
-	public void setExpyears(int expyears) {
-		this.expyears = expyears;
+	public void setExpYears(int expyears) {
+		this.expYears = expyears;
 	}
 
 	public Schedule getSchedule() {

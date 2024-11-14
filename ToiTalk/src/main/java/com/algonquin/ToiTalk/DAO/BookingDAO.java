@@ -53,7 +53,7 @@ public class BookingDAO {
 				tutorName = userDAO.getTutorNameByID(rs.getInt("tutor_id"));
 				studentName = userDAO.getStudentNameByID(rs.getInt("student_id"));
 				Booking book = new Booking(rs.getInt("booking_id"), rs.getInt("tutor_id"), rs.getInt("student_id")
-						, rs.getInt("tutor_schedule_id"), tutorName, studentName, rs.getTimestamp("date"), rs.getString("status"));
+						, rs.getInt("slot_id"), tutorName, studentName, rs.getTimestamp("date"), rs.getString("status"));
 				bookList.add(book);
 			}
 		} catch (SQLException e) {
@@ -64,21 +64,34 @@ public class BookingDAO {
 	    return bookList;
 	}
 	
-    public boolean addBooking(Booking booking) {
-        String sql = "INSERT INTO bookings (tutor_id, student_id, tutor_schedule_id, date, status) VALUES (?, ?, ?, ?, ?)";
+	
+	
+    public Booking addBooking(Booking booking) {
+        String sql = "INSERT INTO bookings (tutor_id, student_id, slot_id, date, status) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, booking.getTutorID());
             statement.setInt(2, booking.getStudentID());
-            statement.setInt(3, booking.getScheduleID());
-            statement.setTimestamp(4, booking.getDate()); // Assuming date is a java.util.Date
+            statement.setInt(3, booking.getSlotID());
+            statement.setTimestamp(4, booking.getDate());
             statement.setString(5, booking.getStatus());
 
             int rowsAffected = statement.executeUpdate();
-            return rowsAffected > 0;
+            if (rowsAffected > 0) {
+                // Retrieve the generated keys
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        // Get the auto-incremented feedback_id
+                        booking.setBookingID(generatedKeys.getInt(1));
+                    } else {
+                        System.err.println("No feedback ID obtained.");
+                    }
+                }
+            }
+            return booking;
         } catch (SQLException e) {
             System.err.println("Failed to add booking: " + e.getMessage());
-            return false;
+            return booking;
         }
     }
 
@@ -88,7 +101,7 @@ public class BookingDAO {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, booking.getTutorID());
             statement.setInt(2, booking.getStudentID());
-            statement.setInt(3, booking.getScheduleID());
+            statement.setInt(3, booking.getSlotID());
             statement.setTimestamp(4, booking.getDate());
             statement.setString(5, booking.getStatus());
             statement.setInt(6, booking.getBookingID());

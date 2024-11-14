@@ -12,6 +12,10 @@ import com.algonquin.ToiTalk.model.Schedule;
 public class ScheduleDAO {
 	Connection connection;
 	
+	public ScheduleDAO(Connection connection) {
+		this.connection = connection;
+	}
+	
 	//map string day to integer value for schedule array location
     private static final Map<String, Integer> dayToIntMap;
 
@@ -40,10 +44,6 @@ public class ScheduleDAO {
     }
 	private Integer DayConverter(String Day) {
 		return dayToIntMap.get(Day);
-	}
-	
-	public ScheduleDAO(Connection connection) {
-		this.connection = connection;
 	}
 	
 	public Schedule loadSchedule(int tutorID) {
@@ -93,7 +93,7 @@ public class ScheduleDAO {
 	}
 	
 	public boolean addSchedule(Schedule schedule) {
-	    String[][] inSchedule = schedule.getSchedule();
+	    String[][] inSchedule = schedule.getArrSchedule();
 	    int tutorID = schedule.getTutorID();
 
 	    String sql = "INSERT INTO tutor_schedule (tutor_id, slot_id, status) VALUES (?, ?, ?)";
@@ -112,13 +112,24 @@ public class ScheduleDAO {
 	                }
 	            }
 	        }
-	        statement.executeBatch(); // Execute all at once
-	        return true;
+	        if (deleteSchedule(tutorID)) {
+		        statement.executeBatch(); // Execute all at once
+		        return true;
+	        } else {
+	        	System.out.println("Failed to delete old entries");
+	        	return false;
+	        }
+
 	    } catch (SQLException e) {
 	    	e.printStackTrace();
 	        System.out.println("Failed to add schedule: " + e.getMessage());
 	        return false;
 	    }
+	}
+	
+	public int generateSlotID(int day, int hour) {
+		int slotID =  day * 24 + hour + 1;
+		return slotID;
 	}
 	
 	public boolean changeScheduleStatus(int tutorID, int day, int hour, String status) {
@@ -127,7 +138,8 @@ public class ScheduleDAO {
 				+ "SET status = ?"
 				+ "WHERE tutor_id = ?"
 				+ "AND slot_id = ?";
-		int slotID =  day * 24 + hour + 1;
+		
+		int slotID = generateSlotID(day, hour);
 		
 	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
 	    	statement.setString(1, status);
