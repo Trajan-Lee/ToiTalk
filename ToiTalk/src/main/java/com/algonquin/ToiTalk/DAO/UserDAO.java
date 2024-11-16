@@ -21,7 +21,7 @@ public class UserDAO {
 	}
 	
     public User validateUser(String email, String password) {
-    	User user;
+    	User user = null;
     		//join both student and tutor onto user
     		String sql = "SELECT * FROM users LEFT JOIN tutors "
     			   	   + "ON users.user_id = tutors.user_id "
@@ -41,17 +41,18 @@ public class UserDAO {
         	e.printStackTrace();
     		System.out.println("Could not load from SQL: USER DATA");
         }
-        return null;
+        return user;
     }
     
     public User loadUser(ResultSet rs) throws SQLException {
     	User user = null;
-				if(rs.getString("user_type")=="student") {
+				if("student".equals(rs.getString("user_type"))) {
 				user = new Student(rs.getString("username"), rs.getString("password"), rs.getString("email"), rs.getString("user_type")
 						, rs.getInt("user_id"), rs.getTimestamp("create_time"), rs.getInt("student_id"));
 				} else {
 					//retrieve tutorID as variable
 					int tutorID = rs.getInt("tutor_id");
+					System.out.println(tutorID);
 					
 					//assign blank value to 'bio' if null
 					String bio = rs.getString("bio");
@@ -81,7 +82,7 @@ public class UserDAO {
         String sqlStudent = "INSERT INTO students (user_id) VALUES (?)";
 
         try (PreparedStatement userStmt = connection.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement studentStmt = connection.prepareStatement(sqlStudent)) {
+             PreparedStatement studentStmt = connection.prepareStatement(sqlStudent, Statement.RETURN_GENERATED_KEYS)) {
 
             // Insert into users table
             userStmt.setString(1, student.getUsername());
@@ -225,14 +226,13 @@ public class UserDAO {
     
     public Tutor getTutorObjByID(int ID) {
     	Tutor tutor = null;
-    	String sqlTutor = "SELECT username FROM users "
+    	String sqlTutor = "SELECT * FROM users "
     			+ "LEFT JOIN tutors ON users.user_id = tutors.user_id "
     			+ "WHERE tutor_id = ?";
     	
 		try (PreparedStatement statement = connection.prepareStatement(sqlTutor)){
 			statement.setInt(1, ID);
 			ResultSet rs = statement.executeQuery();
-			rs.next();
 	        if (rs.next()) {  // Check if a result exists
 	            tutor = (Tutor) loadUser(rs); // Cast loadUser result to Tutor
 	        } else {
@@ -314,17 +314,17 @@ public class UserDAO {
     	
     	String sql = "SELECT * FROM tutors "
         		+ "LEFT JOIN users "
-        		+ "ON tutors.user_id = tutors.user_id "
+        		+ "ON tutors.user_id = users.user_id "
         		+ "WHERE username LIKE ?";
     	
     	List<User> users = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement(sql)){
-            statement.setString(2, "%" + name + "%");
+            statement.setString(1, "%" + name + "%");
             ResultSet rs = statement.executeQuery();
-            User user;
             while (rs.next()) {
-            	user = loadUser(rs);
+            	System.out.println(rs.getString("username"));
+            	User user = loadUser(rs);
             	users.add(user);
             }
         } catch (SQLException e) {
@@ -339,19 +339,21 @@ public class UserDAO {
     	
     	String sql = "SELECT * FROM tutor_languages "
         		+ "LEFT JOIN tutors "
-        		+ "ON tutors.tutor_id = tutors.tutor_languages.tutor_id "
+        		+ "ON tutors.tutor_id = tutor_languages.tutor_id "
         		+ "LEFT JOIN languages "
         		+ "ON languages.language_id = tutor_languages.language_id "
+        		+ "LEFT JOIN users "
+        		+ "ON tutors.user_id = users.user_id "
         		+ "WHERE language_name LIKE ?";
     	
     	List<User> users = new ArrayList<>();
     	
         try (PreparedStatement statement = connection.prepareStatement(sql)){
-            statement.setString(2, "%" + lang + "%");
+            statement.setString(1, "%" + lang + "%");
             ResultSet rs = statement.executeQuery();
-            User user;
             while (rs.next()) {
-            	user = loadUser(rs);
+            	System.out.println(rs.getString("username"));
+            	User user = loadUser(rs);
             	users.add(user);
             }
         } catch (SQLException e) {
@@ -407,8 +409,10 @@ public class UserDAO {
 			boolean languageSuccess = languageDAO.updateTutorLanguage(tutor);
 			if (languageSuccess == true) {
                 tutorStmt.executeUpdate();
+				System.out.println("success updating Tutor_languages");
                 return true;
 			} else {
+				System.out.println("Failed to update Tutor_languages");
 				return false;
 			}
         } catch (SQLException e) {

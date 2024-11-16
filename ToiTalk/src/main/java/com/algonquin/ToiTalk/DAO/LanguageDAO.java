@@ -42,8 +42,8 @@ public class LanguageDAO {
 	
 	public Language getLangByName(String langName) {
 		Language lang = null;
-		String sql = "SELECT *"
-				+ "FROM languages"
+		String sql = "SELECT * "
+				+ "FROM languages "
 				+ "WHERE language_name = ?";
 		
 		try (PreparedStatement statement = connection.prepareStatement(sql)){
@@ -65,7 +65,7 @@ public class LanguageDAO {
 		List<Language> langList = tutor.getLanguages();
 		
 		if (deleteSuccess == true) {
-			String sql = "INSERT INTO tutor_languages (tutor_id, language_id)"
+			String sql = "INSERT INTO tutor_languages (tutor_id, language_id) "
 					+ "VALUES (?, ?)";
 			try (PreparedStatement statement = connection.prepareStatement(sql)){
 				statement.setInt(1, tutorID);
@@ -86,9 +86,8 @@ public class LanguageDAO {
 	}
 	
 	public boolean deleteAllTutorLang(int tutorID) {
-		String sql = "DELETE *"
-				+ "FROM tutor_languages"
-				+ "WHERE tutor_id = ?";
+		String sql = "DELETE FROM tutor_languages "
+				+ "WHERE tutor_id = ? ";
 		
 		try (PreparedStatement statement = connection.prepareStatement(sql)){
 			statement.setInt(1, tutorID);
@@ -110,7 +109,7 @@ public class LanguageDAO {
 		String sql = "SELECT * FROM tutor_languages "
 				+ "LEFT JOIN languages "
 				+ "ON tutor_languages.language_id = languages.language_id "
-				+ "WHERE tutor_id = ?";
+				+ "WHERE tutor_languages.tutor_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)){
 		   statement.setInt(1, tutorID);
@@ -129,7 +128,7 @@ public class LanguageDAO {
 		return matchLang;
 	}
 	
-	public List<String> listAllLang(){
+	public List<String> listStrAllLang(){
 		List<String> langList = new ArrayList<>();
 		
     	String sql = "SELECT * FROM languages";

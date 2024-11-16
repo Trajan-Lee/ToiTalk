@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/updateProfile")
+@WebServlet("/submitProfileServlet")
 public class UpdateProfileServlet extends HttpServlet {
 	Connection connection;
 	LanguageDAO languageDAO;
@@ -48,7 +48,7 @@ public class UpdateProfileServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("signin.jsp");
             return;
         }
 
@@ -58,7 +58,7 @@ public class UpdateProfileServlet extends HttpServlet {
 
 
         // Update tutor-specific fields if the user is a tutor
-        if ("Tutor".equals(user.getType()) && user instanceof Tutor) {
+        if ("tutor".equals(user.getType())) {
             Tutor tutor = (Tutor) user;
             tutor.setBio(request.getParameter("bio"));
             tutor.setExpYears(Integer.parseInt(request.getParameter("expYears")));
@@ -66,16 +66,18 @@ public class UpdateProfileServlet extends HttpServlet {
             String[] selectedLanguages = request.getParameterValues("languages");
             List<Language> languages = new ArrayList<>();
             for (String lang : selectedLanguages) {
+            	System.out.println(lang);
                 languages.add(languageDAO.getLangByName(lang)); // assuming a Language constructor that takes a language name
             }
             tutor.setLanguages(languages);
             userDAO.updateTutor(tutor);
+            user = tutor;
         }
 
         // Update session attribute with the modified user
         session.setAttribute("user", user);
 
         // Redirect back to the profile page after saving changes
-        response.sendRedirect("profile.jsp");
+        response.sendRedirect("loadProfileServlet");
     }
 }

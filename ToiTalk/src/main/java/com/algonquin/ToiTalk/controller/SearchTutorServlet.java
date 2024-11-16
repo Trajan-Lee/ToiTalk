@@ -43,7 +43,7 @@ public class SearchTutorServlet extends HttpServlet {
             throws ServletException, IOException {
         String searchInput = request.getParameter("searchInput");
         String searchType = request.getParameter("searchType");
-        List<String> allLangList = langDAO.listAllLang();
+        List<String> allLangList = langDAO.listStrAllLang();
         request.setAttribute("langList", allLangList);
         boolean langYes = "language".equals(searchType); // true if searching by language
 

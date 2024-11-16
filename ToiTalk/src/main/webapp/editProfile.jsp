@@ -8,21 +8,30 @@
     <title>Edit Profile</title>
     <style>
         .language-box {
-            display: inline-block;
+            display: flex;
+    		align-items: center;
+    		justify-content: space-between;
             padding: 5px 10px;
             margin: 5px;
             border: 1px solid #ddd;
             border-radius: 4px;
             background-color: #f9f9f9;
             position: relative;
+            max-width: 75px;
         }
+        .language-box .text-container {
+		    flex-grow: 1; /* Allow text container to take up available space */
+		}
         .remove-btn {
+			background-color: transparent;
+   			border: none;
             color: red;
             font-weight: bold;
             cursor: pointer;
             position: absolute;
             top: 0;
             right: 0;
+            align-self: center;
         }
         .add-language-btn {
             margin-top: 10px;
@@ -34,7 +43,6 @@
             border-radius: 4px;
         }
         .language-dropdown-box {
-            display: none;
             margin-top: 10px;
             padding: 10px;
             border: 1px solid #ddd;
@@ -72,7 +80,11 @@
     <script>
         function toggleAddLanguageBox() {
             const dropdownBox = document.getElementById("languageDropdownBox");
-            dropdownBox.style.display = dropdownBox.style.display === "none" ? "block" : "none";
+            if (dropdownBox.style.display === "none"){
+            	dropdownBox.style.display = "block";
+            } else {
+            	dropdownBox.style.display = "none";
+            }
         }
     </script>
 </head>
@@ -80,7 +92,7 @@
     <h1>Edit Profile</h1>
     
 
-    <form action="updateProfile" method="post">
+    <form action="submitProfileServlet" method="post">
         <!-- Display Username and Email Fields -->
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" value="${user.getUsername()}" required /><br/><br/>
@@ -90,41 +102,38 @@
         
         <!-- Conditional Fields Based on User Type -->
         <c:choose>
-            <!-- Student Fields -->
             <c:when test="${user.getType() == 'student'}">
                 <p>You are editing a Student profile.</p>
             </c:when>
             
-            <!-- Tutor Fields -->
             <c:when test="${user.getType() == 'tutor'}">
                 <p>You are editing a Tutor profile.</p>
                 
-                <!-- Bio Field for Tutor-->
                 <label for="bio">Bio:</label>
                 <textarea id="bio" name="bio" rows="4" cols="50">${user.getBio()}</textarea><br/><br/>
                 
-		        <!-- Languages Section-->
 		        
 		        <div id="messageBox"></div>
 		        
 		        <label>Languages:</label>
 		        <div id="languagesContainer">
 		            <c:forEach var="lang" items="${user.getLanguages()}">
-		                <div id="lang-${lang.getLangName()}" class="language-box">
-		                    ${lang.getLangName()}
-		                    <input type="hidden" name="languages" value="${lang.getLangName()}">
-		                    <button type="button" class="remove-btn" onclick="removeLanguage('${lang.getLangName()}')">X</button>
-		                </div>
+						 <div id="lang-${lang.getLangName()}" class="language-box">
+						    <div class="text-container">
+						        ${lang.getLangName()}
+						        <input type="hidden" name="languages" value="${lang.getLangName()}">
+						    </div>
+						    <button type="button" class="remove-btn" onclick="removeLanguage('${lang.getLangName()}')">X</button>
+						</div>
 		            </c:forEach>
 		            <button type="button" class="add-language-btn" onclick="toggleAddLanguageBox()">Add</button>
 		        </div>
 		
-		        <!-- Add Language Dropdown Box -->
-		        <div id="languageDropdownBox" class="language-dropdown-box">
+		        <div id="languageDropdownBox" class="language-dropdown-box" style="display: none;">
 		            <label for="newLanguage">Select Language:</label>
 		            <select id="newLanguage" name="newLanguage">
 		                <c:forEach var="allLang" items="${allLang}">
-		                    <option value="${allLang.getLangName()}">${allLang.getLangName()}</option>
+		                    <option value="${allLang}">${allLang}</option>
 		                </c:forEach>
 		            </select>
 		            <button type="button" class="confirm-btn" onclick="confirmAddLanguage()">✔</button>
@@ -143,31 +152,52 @@
     <script>
 	    function removeLanguage(languageToRemove) {
 	        // Remove the language element from the DOM
-	        const languageElement = document.getElementById(`lang-${languageToRemove}`);
+	        const languageElement = document.getElementById("lang-"+ languageToRemove);
 	        if (languageElement) {
 	            languageElement.remove();
-	        }
-	
-	        // Optionally, you could remove the corresponding hidden input here as well
-	        const inputElement = document.querySelector(`input[name="languages"][value="${languageToRemove}"]`);
-	        if (inputElement) {
-	            inputElement.remove();
 	        }
 	    }
 
 
-	    function addLanguage() {
+	    function confirmAddLanguage() {
 	        const newLanguage = document.getElementById('newLanguage').value;
 
 	        // Add the new language to the container
 	        const newLangDiv = document.createElement('div');
-	        newLangDiv.className = 'language-box';
-	        newLangDiv.id = `lang-${newLanguage}`;
-	        newLangDiv.innerHTML = `${newLanguage}
-	                                <input type="hidden" name="languages" value="${newLanguage}">
-	                                <button type="button" class="remove-btn" onclick="removeLanguage('${newLanguage}')">X</button>`;
+			newLangDiv.className = 'language-box';
+			newLangDiv.id = `lang-${newLanguage}`;
+			
+			// Create the text container div
+			const textContainer = document.createElement('div');
+			textContainer.className = 'text-container';
+			
+			// Add the language text to the text container
+			const languageText = document.createTextNode(newLanguage);
+			textContainer.appendChild(languageText);
+			
+			// Create the hidden input element
+			const hiddenInput = document.createElement('input');
+			hiddenInput.type = 'hidden';
+			hiddenInput.name = 'languages';
+			hiddenInput.value = newLanguage;
+			textContainer.appendChild(hiddenInput);
+			
+			// Create the remove button
+			const removeBtn = document.createElement('button');
+			removeBtn.type = 'button';
+			removeBtn.className = 'remove-btn';
+			removeBtn.textContent = 'X';
+			removeBtn.onclick = () => removeLanguage(newLanguage); // Assign the removeLanguage function
+			
+			// Append the text container to the newLangDiv
+			newLangDiv.appendChild(textContainer);
+			
+			// Append the button to the newLangDiv
+			newLangDiv.appendChild(removeBtn);
+			
+			// Insert the newLangDiv into the languagesContainer before the add-language button
+			document.getElementById('languagesContainer').insertBefore(newLangDiv, document.querySelector('.add-language-btn'));
 
-	        document.getElementById('languagesContainer').insertBefore(newLangDiv, document.querySelector('.add-language-btn'));
 
 	        // Hide the add language box
 	        toggleAddLanguageBox();

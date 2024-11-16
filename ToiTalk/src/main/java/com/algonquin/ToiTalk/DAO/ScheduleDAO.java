@@ -78,7 +78,7 @@ public class ScheduleDAO {
 	//Will be run every time an update is performed. Essentially, wipes the schedule and then rebuilds it in DB
 	public boolean deleteSchedule(int tutorID) {
 		
-		String sql = "DELETE * FROM tutor_schedule "
+		String sql = "DELETE FROM tutor_schedule "
 				+ "WHERE tutor_id = ?";
 		
         try (PreparedStatement statement = connection.prepareStatement(sql)){

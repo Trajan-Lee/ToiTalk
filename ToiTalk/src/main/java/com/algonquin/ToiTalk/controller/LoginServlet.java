@@ -36,14 +36,17 @@ public class LoginServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
+		System.out.println("Email: " + email + "PW: " + password);
 		
 		User user = userDAO.validateUser(email, password);
 		if (user != null) {
 			request.getSession().setAttribute("user", user);
 			//response.sendRedirect("dashboard.jsp");
 			System.out.println("user validated");
+	        response.sendRedirect("dashboard.jsp");
 		} else {
 			request.setAttribute("errorMessage","Invalid username or password");
+	        response.sendRedirect("signin.jsp");
 		}
 	}
 }

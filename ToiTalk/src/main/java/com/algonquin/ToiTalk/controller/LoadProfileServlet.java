@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebServlet("/profile")
-public class ProfileServlet extends HttpServlet {
+@WebServlet("/loadProfileServlet")
+public class LoadProfileServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -21,11 +21,11 @@ public class ProfileServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         
         if (user == null) {
-            response.sendRedirect("login.jsp"); // Redirect if not logged in
+            response.sendRedirect("signin.jsp"); // Redirect if not logged in
             return;
         }
         
         // Forward to profile.jsp to display profile information
-        request.getRequestDispatcher("/profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/userProfile.jsp").forward(request, response);
     }
 }

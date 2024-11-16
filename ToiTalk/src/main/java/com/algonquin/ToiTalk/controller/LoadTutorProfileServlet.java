@@ -14,7 +14,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @WebServlet("/loadTutorProfileServlet")
-public class TutorProfileServlet extends HttpServlet {
+public class LoadTutorProfileServlet extends HttpServlet {
     private UserDAO userDAO;
     Connection connection;
 

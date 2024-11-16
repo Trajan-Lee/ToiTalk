@@ -55,13 +55,13 @@
 </head>
 <body>
 
-<h1>Book a Session with ${tutor.username}</h1>
+<h1>Book a Session with ${tutor.getUsername()}</h1>
 	<c:if test="${not empty param.tutorId}">
-    	<c:set var="tutorId" value="${param.tutorId}" />
+    	<c:set var="tutorId" value="${tutor.getTutorID()}" />
 	</c:if>
 	
 	<c:if test="${not empty param.schedule}">
-    	<c:set var="schedule" value="${param.schedule}" />
+    	<c:set var="schedule" value="${schedule}" />
 	</c:if>
 
 <!-- Schedule Table -->
@@ -83,7 +83,7 @@
                 <c:forEach var="day" begin="0" end="6">
                     <td>
                         <c:choose>
-							<c:when test="${schedule == 'Open'}">
+							<c:when test="${schedule[day][hour] == 'Open'}">
 						        <!-- Open slot: clickable -->
 						        <button type="button" class="open" onclick="showConfirmationForm(${day}, ${hour})">${hour}:00</button>
 						    </c:when>
