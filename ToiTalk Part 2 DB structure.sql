@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `toitalk`.`users` (
   `username` VARCHAR(16) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
   `password` VARCHAR(32) NOT NULL,
-  `user_type` VARCHAR(20) NULL DEFAULT NULL,
+  `user_type` ENUM('student', 'tutor') NOT NULL,
   `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`))
 ENGINE = InnoDB
@@ -39,7 +39,7 @@ DROP TABLE IF EXISTS `toitalk`.`tutors` ;
 CREATE TABLE IF NOT EXISTS `toitalk`.`tutors` (
   `tutor_id` INT NOT NULL AUTO_INCREMENT,
   `language` VARCHAR(45) NOT NULL,
-  `experience_years` INT NULL DEFAULT NULL,
+  `years` INT NULL DEFAULT NULL,
   `bio` VARCHAR(500) NULL DEFAULT NULL,
   `rating` FLOAT NULL DEFAULT NULL,
   `user_id` INT NOT NULL,
@@ -85,29 +85,6 @@ DEFAULT CHARACTER SET = utf8mb3;
 
 
 -- -----------------------------------------------------
--- Table `toitalk`.`tutor_schedule`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `toitalk`.`tutor_schedule` ;
-
-CREATE TABLE IF NOT EXISTS `toitalk`.`tutor_schedule` (
-  `tutor_schedule_id` INT NOT NULL AUTO_INCREMENT,
-  `slot_id` INT NOT NULL,
-  `tutor_id` INT NOT NULL,
-  `status` ENUM("Booked", "Open") NOT NULL DEFAULT 'Open',
-  PRIMARY KEY (`tutor_schedule_id`),
-  INDEX `fk_tutor_schedule_time_slots1_idx` (`slot_id` ASC) VISIBLE,
-  INDEX `fk_tutor_schedule_tutors1_idx` (`tutor_id` ASC) VISIBLE,
-  CONSTRAINT `fk_tutor_schedule_time_slots1`
-    FOREIGN KEY (`slot_id`)
-    REFERENCES `toitalk`.`time_slots` (`slot_id`),
-  CONSTRAINT `fk_tutor_schedule_tutors1`
-    FOREIGN KEY (`tutor_id`)
-    REFERENCES `toitalk`.`tutors` (`tutor_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
 -- Table `toitalk`.`bookings`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `toitalk`.`bookings` ;
@@ -116,13 +93,13 @@ CREATE TABLE IF NOT EXISTS `toitalk`.`bookings` (
   `booking_id` INT NOT NULL AUTO_INCREMENT,
   `tutor_id` INT NOT NULL,
   `student_id` INT NOT NULL,
-  `tutor_schedule_id` INT NOT NULL,
-  `date` DATETIME NOT NULL,
-  `status` ENUM('scheduled', 'completed', 'canceled') NULL DEFAULT 'scheduled',
-  PRIMARY KEY (`booking_id`, `tutor_id`, `student_id`, `tutor_schedule_id`),
+  `slot_id` INT NOT NULL,
+  `date` DATETIME NULL,
+  `status` ENUM('scheduled', 'completed', 'canceled') NOT NULL DEFAULT 'scheduled',
+  PRIMARY KEY (`booking_id`),
   INDEX `tutor_id` (`tutor_id` ASC) VISIBLE,
   INDEX `fk_bookings_students1_idx` (`student_id` ASC) VISIBLE,
-  INDEX `fk_bookings_tutor_schedule1_idx` (`tutor_schedule_id` ASC) VISIBLE,
+  INDEX `fk_bookings_time_slots1_idx` (`slot_id` ASC) VISIBLE,
   CONSTRAINT `sessions_ibfk_1`
     FOREIGN KEY (`tutor_id`)
     REFERENCES `toitalk`.`tutors` (`tutor_id`),
@@ -131,9 +108,9 @@ CREATE TABLE IF NOT EXISTS `toitalk`.`bookings` (
     REFERENCES `toitalk`.`students` (`student_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_bookings_tutor_schedule1`
-    FOREIGN KEY (`tutor_schedule_id`)
-    REFERENCES `toitalk`.`tutor_schedule` (`tutor_schedule_id`)
+  CONSTRAINT `fk_bookings_time_slots1`
+    FOREIGN KEY (`slot_id`)
+    REFERENCES `toitalk`.`time_slots` (`slot_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -197,6 +174,29 @@ CREATE TABLE IF NOT EXISTS `toitalk`.`tutor_languages` (
   CONSTRAINT `tutor_languages_ibfk_2`
     FOREIGN KEY (`language_id`)
     REFERENCES `toitalk`.`languages` (`language_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `toitalk`.`tutor_schedule`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `toitalk`.`tutor_schedule` ;
+
+CREATE TABLE IF NOT EXISTS `toitalk`.`tutor_schedule` (
+  `tutor_schedule_id` INT NOT NULL AUTO_INCREMENT,
+  `slot_id` INT NOT NULL,
+  `tutor_id` INT NOT NULL,
+  `status` ENUM("Booked", "Open") NOT NULL DEFAULT 'Open',
+  PRIMARY KEY (`tutor_schedule_id`),
+  INDEX `fk_tutor_schedule_time_slots1_idx` (`slot_id` ASC) VISIBLE,
+  INDEX `fk_tutor_schedule_tutors1_idx` (`tutor_id` ASC) VISIBLE,
+  CONSTRAINT `fk_tutor_schedule_time_slots1`
+    FOREIGN KEY (`slot_id`)
+    REFERENCES `toitalk`.`time_slots` (`slot_id`),
+  CONSTRAINT `fk_tutor_schedule_tutors1`
+    FOREIGN KEY (`tutor_id`)
+    REFERENCES `toitalk`.`tutors` (`tutor_id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 

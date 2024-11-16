@@ -56,13 +56,6 @@
 <body>
 
 <h1>Book a Session with ${tutor.getUsername()}</h1>
-	<c:if test="${not empty param.tutorId}">
-    	<c:set var="tutorId" value="${tutor.getTutorID()}" />
-	</c:if>
-	
-	<c:if test="${not empty param.schedule}">
-    	<c:set var="schedule" value="${schedule}" />
-	</c:if>
 
 <!-- Schedule Table -->
 <table>

@@ -84,6 +84,6 @@ public class ConfirmBookingServlet extends HttpServlet {
         }
 
         // Redirect to the tutor's profile or booking page with the confirmation message
-        request.getRequestDispatcher("/bookTutor.jsp").forward(request, response);
+        request.getRequestDispatcher("/dashboard.jsp").forward(request, response);
     }
 }

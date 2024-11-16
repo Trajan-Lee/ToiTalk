@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class BookingDAO {
     public Booking addBooking(Booking booking) {
         String sql = "INSERT INTO bookings (tutor_id, student_id, slot_id, date, status) VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, booking.getTutorID());
             statement.setInt(2, booking.getStudentID());
             statement.setInt(3, booking.getSlotID());

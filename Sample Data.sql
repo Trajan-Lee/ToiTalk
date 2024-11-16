@@ -1,3 +1,13 @@
+-- Delete statements
+DELETE From `toitalk`.`feedback`;
+DELETE FROM `toitalk`.`bookings`;
+DELETE FROM `toitalk`.`tutor_schedule`;
+DELETE FROM `toitalk`.`tutor_languages`;
+DELETE FROM `toitalk`.`students`;
+DELETE FROM `toitalk`.`tutors`;
+DELETE FROM `toitalk`.`users`;
+DELETE FROM `toitalk`.`languages`;
+
 -- Insert data into languages
 INSERT INTO `toitalk`.`languages` (`language_id`, `language_name`) VALUES
 (1, 'French'),
@@ -7,7 +17,7 @@ INSERT INTO `toitalk`.`languages` (`language_id`, `language_name`) VALUES
 -- Insert data into users
 INSERT INTO `toitalk`.`users` (`user_id`, `username`, `email`, `password`, `user_type`, `create_time`) VALUES
 (1, 'tutor_john', 'john@example.com', 'password123', 'tutor', NOW()),
-(2, 'studet_jaen', 'jane@example.com', 'password123', 'student', NOW()),
+(2, 'student_jane', 'jane@example.com', 'password123', 'student', NOW()),
 (3, 'tutor_alex', 'alex@example.com', 'password123', 'tutor', NOW()),
 (4, 'student_mary', 'mary@example.com', 'password123', 'student', NOW()),
 (5, 'tutor_sara', 'sara@example.com', 'password123', 'tutor', NOW());
@@ -29,13 +39,21 @@ INSERT INTO `toitalk`.`tutor_languages` (`tutor_id`, `language_id`) VALUES
 (2, 2),  -- Alex teaches Spanish
 (3, 3);  -- Sara teaches German
 
+-- insert data into tutor_schedule
+INSERT INTO `toitalk`.`tutor_schedule` (`tutor_id`, `slot_id`, `tutor_schedule_id`) VALUES
+(1,2,1),
+(2,3,2),
+(3,4,3),
+(1,5,4),
+(2,6,5);
+
 -- Insert data into bookings
-INSERT INTO `toitalk`.`bookings` (`booking_id`, `tutor_id`, `student_id`, `tutor_schedule_id`, `date`, `status`) VALUES
-(1, 1, 1, 1, '2024-11-05 10:00:00', 'scheduled'),
-(2, 2, 1, 2, '2024-11-06 11:00:00', 'completed'),
-(3, 3, 2, 3, '2024-11-07 09:00:00', 'scheduled'),
-(4, 1, 2, 4, '2024-11-08 12:00:00', 'canceled'),
-(5, 2, 2, 5, '2024-11-09 14:00:00', 'scheduled');
+INSERT INTO `toitalk`.`bookings` (`booking_id`, `tutor_id`, `student_id`, `slot_id`, `date`, `status`) VALUES
+(1, 1, 1, 2, '2024-11-05 10:00:00', 'scheduled'),
+(2, 2, 1, 3, '2024-11-06 11:00:00', 'canceled'),
+(3, 3, 2, 4, '2024-11-07 09:00:00', 'scheduled'),
+(4, 1, 2, 5, '2024-11-08 12:00:00', 'canceled'),
+(5, 2, 2, 6, '2024-11-09 14:00:00', 'scheduled');
 
 -- Insert data into feedback
 INSERT INTO `toitalk`.`feedback` (`feedback_id`, `booking_id`, `rating`, `comment`, `created_at`, `tutor_id`) VALUES

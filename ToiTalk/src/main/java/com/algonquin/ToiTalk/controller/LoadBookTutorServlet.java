@@ -48,6 +48,7 @@ public class LoadBookTutorServlet extends HttpServlet {
                 	schedule = tutor.getSchedule().getArrSchedule();
                     // Set the Tutor object as a request attribute to pass it to the JSP
                     request.setAttribute("schedule", schedule);
+                    request.setAttribute("tutorId", tutorID);
                     // Forward to the tutor profile JSP page
                     request.getRequestDispatcher("/bookTutor.jsp").forward(request, response);
                     return;
