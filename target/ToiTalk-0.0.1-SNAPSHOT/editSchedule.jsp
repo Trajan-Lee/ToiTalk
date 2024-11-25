@@ -77,13 +77,12 @@
             </tr>
 
             <!-- Hour rows -->
-            <!--  ADD LOGIC TO GET BOOKING ID AND LINK TO THE BOOKING DETAILS PAGE -->
             <c:forEach var="hour" begin="0" end="23">
                 <tr>
                 	<td>${hour}:00</td>
                     <c:forEach var="day" begin="0" end="6">
                         <td id="cell-${day}-${hour}" class="${empty tutorSchedule[day][hour] ? 'soft-red' : (tutorSchedule[day][hour] == 'Open' ? 'soft-green' : 'soft-blue')}" 
-                            onclick="toggleSchedule(${day}, ${hour})">
+                            onclick="toggleSchedule('${day}', '${hour}')">
                             <c:choose>
                                 <c:when test="${empty tutorSchedule[day][hour]}"> </c:when>
                                 <c:when test="${tutorSchedule[day][hour] == 'Open'}">

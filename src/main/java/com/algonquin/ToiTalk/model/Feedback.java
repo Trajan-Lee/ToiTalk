@@ -8,7 +8,6 @@ public class Feedback {
 	private int bookingID;
 	private int tutorID;
 	private String tutorName;
-	private int sessionID;
 	private int rating;
 	private String comment;
 	private Timestamp created;
