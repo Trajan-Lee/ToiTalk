@@ -8,11 +8,10 @@ import com.algonquin.ToiTalk.model.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
 
-
-	// Entry point for the application, so it loads persistent objects
 public class UserDAO {
 	private Connection connection;
 	
@@ -21,25 +20,29 @@ public class UserDAO {
 	}
 	
     public User validateUser(String email, String password) {
-    	User user = null;
-    		//join both student and tutor onto user
-    		String sql = "SELECT * FROM users LEFT JOIN tutors "
-    			   	   + "ON users.user_id = tutors.user_id "
-    			   	   + "LEFT JOIN students ON users.user_id = students.user_id "
-    			   	   + "WHERE email = ? AND password = ?";
-
+        User user = null;
+        //join both student and tutor onto user
+        String sql = "SELECT * FROM users LEFT JOIN tutors "
+                    + "ON users.user_id = tutors.user_id "
+                    + "LEFT JOIN students ON users.user_id = students.user_id "
+                    + "WHERE email = ?";
+    
         try (PreparedStatement statement = connection.prepareStatement(sql)){
             statement.setString(1, email);
-            statement.setString(2, password);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
-            	user = loadUser(rs);
+                user = loadUser(rs);
+                String hashedPassword = rs.getString("password");
+                // Verify the password using BCrypt
+                if (!BCrypt.checkpw(password, hashedPassword)) {
+                    return null; // Password doesn't match
+                }
+                // Clear any password from the user object for security
+                user.setPassword(null);
             }
-
-
         } catch (SQLException e) {
-        	e.printStackTrace();
-    		System.out.println("Could not load from SQL: USER DATA");
+            e.printStackTrace();
+            System.out.println("Could not load from SQL: USER DATA");
         }
         return user;
     }
@@ -47,7 +50,7 @@ public class UserDAO {
     public User loadUser(ResultSet rs) throws SQLException {
     	User user = null;
 				if("student".equals(rs.getString("user_type"))) {
-				user = new Student(rs.getString("username"), rs.getString("password"), rs.getString("email"), rs.getString("user_type")
+				user = new Student(rs.getString("username"), null, rs.getString("email"), rs.getString("user_type")
 						, rs.getInt("user_id"), rs.getTimestamp("create_time"), rs.getInt("student_id"));
 				} else {
 					//retrieve tutorID as variable
@@ -70,7 +73,7 @@ public class UserDAO {
 				    	tutorSchedule = scheduleDAO.loadSchedule(tutorID);
 					
 				    //construct object	
-					user =  new Tutor(rs.getString("username"), rs.getString("password"), rs.getString("email"), rs.getString("user_type"), rs.getInt("user_id"), rs.getTimestamp("create_time")
+					user =  new Tutor(rs.getString("username"), null, rs.getString("email"), rs.getString("user_type"), rs.getInt("user_id"), rs.getTimestamp("create_time")
 									 , tutorID, matchList, bio, rs.getFloat("rating"), rs.getInt("years"), tutorSchedule);
 				}
         	return user;
@@ -84,10 +87,15 @@ public class UserDAO {
         try (PreparedStatement userStmt = connection.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement studentStmt = connection.prepareStatement(sqlStudent, Statement.RETURN_GENERATED_KEYS)) {
 
+            // Hash the password using BCrypt and immediately clear it from the object
+            String plainPassword = student.getPassword();
+            String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+            student.setPassword(null); // Clear the password from memory
+
             // Insert into users table
             userStmt.setString(1, student.getUsername());
             userStmt.setString(2, student.getEmail());
-            userStmt.setString(3, student.getPassword());
+            userStmt.setString(3, hashedPassword);
             userStmt.executeUpdate();
 
             // Retrieve the generated user ID
@@ -107,6 +115,7 @@ public class UserDAO {
                         System.err.println("No feedback ID obtained.");
                     }
                 }
+                student.setPassword(null);
                 return student;
             }
         } catch (SQLException e) {
@@ -124,10 +133,15 @@ public class UserDAO {
         try (PreparedStatement userStmt = connection.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement tutorStmt = connection.prepareStatement(sqlTutor, Statement.RETURN_GENERATED_KEYS)) {
 
+            // Hash the password using BCrypt and immediately clear it from the object
+            String plainPassword = tutor.getPassword();
+            String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+            tutor.setPassword(null); // Clear the password from memory
+
             // Insert into users table
             userStmt.setString(1, tutor.getUsername());
             userStmt.setString(2, tutor.getEmail());
-            userStmt.setString(3, tutor.getPassword());
+            userStmt.setString(3, hashedPassword);
             userStmt.executeUpdate();
 
             // Retrieve the generated user ID
@@ -162,6 +176,7 @@ public class UserDAO {
             e.printStackTrace();
             System.err.println("Error creating tutor: " + e.getMessage());
         } 
+        tutor.setPassword(null);
         return tutor;
     }
 
@@ -370,10 +385,13 @@ public class UserDAO {
 
         try (PreparedStatement statement = connection.prepareStatement(sqlUser)) {
 
+            // Hash the password using BCrypt
+            String hashedPassword = BCrypt.hashpw(student.getPassword(), BCrypt.gensalt());
+
             // Update in users table
             statement.setString(1, student.getUsername());
             statement.setString(2, student.getEmail());
-            statement.setString(3, student.getPassword());
+            statement.setString(3, hashedPassword);
             statement.setInt(4, student.getUserID());
             statement.executeUpdate();
 
@@ -392,10 +410,13 @@ public class UserDAO {
         try (PreparedStatement userStmt = connection.prepareStatement(sqlUser);
              PreparedStatement tutorStmt = connection.prepareStatement(sqlTutor)) {
 
+            // Hash the password using BCrypt
+            String hashedPassword = BCrypt.hashpw(tutor.getPassword(), BCrypt.gensalt());
+
             // Update in users table
             userStmt.setString(1, tutor.getUsername());
             userStmt.setString(2, tutor.getEmail());
-            userStmt.setString(3, tutor.getPassword());
+            userStmt.setString(3, hashedPassword);
             userStmt.setInt(4, tutor.getTutorID());
             userStmt.executeUpdate();
 
@@ -425,4 +446,3 @@ public class UserDAO {
 	    }
 	}
 }
-    
