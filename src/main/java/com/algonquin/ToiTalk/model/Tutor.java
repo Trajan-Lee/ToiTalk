@@ -10,12 +10,12 @@ public class Tutor extends User {
 	private int tutorID;
 	private List<Language> languages;
 	private String bio;
-	private float rating;
+	private double rating;
 	private int expYears;
 	private Schedule schedule;
 	
 	public Tutor(String username, String password, String email, String type, int ID, Timestamp create_time,
-		int tutorID, List<Language> languages, String bio, float rating, int expYears, Schedule schedule) {
+		int tutorID, List<Language> languages, String bio, double rating, int expYears, Schedule schedule) {
 		super(username, password, email, type, ID, create_time);
 		this.tutorID = tutorID;
 		this.languages = languages;
@@ -51,7 +51,7 @@ public class Tutor extends User {
 		this.bio = bio;
 	}
 
-	public float getRating() {
+	public double getRating() {
 		return rating;
 	}
 

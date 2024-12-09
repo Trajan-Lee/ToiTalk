@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,55 +17,119 @@ public class FeedbackDAO {
 		this.connection = connection;
 	}
 	
-	public List<Feedback> loadFeedback(Integer feedbackID, Integer bookingID, Integer tutorID){
-		List<Feedback> fbList = new ArrayList<>();
-		String sql = "SELECT * FROM feedback "
-				+ "WHERE feedback_id LIKE ? "
-				+ "AND booking_id LIKE ? "
-				+ "AND tutor_id LIKE ?";
+	public List<Feedback> loadListFeedback(Integer feedbackID, Integer bookingID, Integer tutorID) {
+	    List<Feedback> fbList = new ArrayList<>();
+	    StringBuilder sql = new StringBuilder("SELECT * FROM feedback WHERE 1=1");
+	    List<Object> parameters = new ArrayList<>();
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)){
-			//add wildcare to ID if null
-			if (feedbackID != null) {
-				statement.setInt(1, feedbackID);
-			} else {
-				statement.setString(1, "%");
-			}
-			
-			if (bookingID != null) {
-				statement.setInt(2, bookingID);
-			} else {
-				statement.setString(2, "%");
-			}
-			
-			if (tutorID != null) {
-				statement.setInt(3, tutorID);
-			} else {
-				statement.setString(3, "%");
+	    // Dynamically build the query and add parameters
+	    if (feedbackID != null) {
+	        sql.append(" AND feedback_id = ?");
+	        parameters.add(feedbackID);
+	    }
+	    if (bookingID != null) {
+	        sql.append(" AND booking_id = ?");
+	        parameters.add(bookingID);
+	    }
+	    if (tutorID != null) {
+	        sql.append(" AND tutor_id = ?");
+	        parameters.add(tutorID);
+	    }
+
+	    try (PreparedStatement statement = connection.prepareStatement(sql.toString())) {
+	        // Bind the parameters dynamically
+	        for (int i = 0; i < parameters.size(); i++) {
+	            Object param = parameters.get(i);
+	            if (param instanceof Integer) {
+	                statement.setInt(i + 1, (Integer) param);
+	            } else if (param instanceof String) {
+	                statement.setString(i + 1, (String) param);
+	            }
+	        }
+
+	        ResultSet rs = statement.executeQuery();
+	        while (rs.next()) {
+	            Feedback fb = loadFeedbackFromRs(rs);
+	            fbList.add(fb);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        System.out.println("Could not load from SQL: FEEDBACK DATA");
+	    }
+
+	    return fbList;
+	}
+	
+	public Feedback loadSingleFeedback(Integer feedbackID, Integer bookingID, Integer tutorID) {
+		Feedback feedback = null;
+		StringBuilder sql = new StringBuilder("SELECT * FROM feedback WHERE 1=1");
+		List<Object> parameters = new ArrayList<>();
+
+		// Dynamically build the query and add parameters
+		if (feedbackID != null) {
+			sql.append(" AND feedback_id = ?");
+			parameters.add(feedbackID);
+		}
+		if (bookingID != null) {
+			sql.append(" AND booking_id = ?");
+			parameters.add(bookingID);
+		}
+		if (tutorID != null) {
+			sql.append(" AND tutor_id = ?");
+			parameters.add(tutorID);
+		}
+
+		try (PreparedStatement statement = connection.prepareStatement(sql.toString())) {
+			// Bind the parameters dynamically
+			for (int i = 0; i < parameters.size(); i++) {
+				Object param = parameters.get(i);
+				if (param instanceof Integer) {
+					statement.setInt(i + 1, (Integer) param);
+				} else if (param instanceof String) {
+					statement.setString(i + 1, (String) param);
+				}
 			}
 
 			ResultSet rs = statement.executeQuery();
-			UserDAO userDAO = new UserDAO(connection);
-			String tutorName;
-			while (rs.next()) {
-				tutorName = userDAO.getTutorNameByID(rs.getInt("tutor_id"));
-				Feedback fb = new Feedback(rs.getInt("feedback_id"), rs.getInt("booking_id"), rs.getInt("tutor_id")
-						, tutorName, rs.getInt("rating"), rs.getString("comment"), rs.getTimestamp("created_at"));
-				fbList.add(fb);
+			if (rs.next()) {
+				feedback = loadFeedbackFromRs(rs);
 			}
 		} catch (SQLException e) {
-	    	e.printStackTrace();
-			System.out.println("Could not load from SQL: BOOKING DATA");
+			e.printStackTrace();
+			System.out.println("Could not load from SQL: FEEDBACK DATA");
 		}
-		
-	    return fbList;
-		
+
+		return feedback;
 	}
+
+	/**
+	 * Creates a Feedback object from the given ResultSet.
+	 * 
+	 * @param rs the ResultSet containing the feedback data
+	 * @return the Feedback object
+	 * @throws SQLException if any database access error occurs
+	 */
+	private Feedback loadFeedbackFromRs(ResultSet rs) throws SQLException {
+	    // Create UserDAO for retrieving tutor name
+	    UserDAO userDAO = new UserDAO(connection);
+	    String tutorName = userDAO.getTutorNameByID(rs.getInt("tutor_id"));
+
+	    return new Feedback(
+	        rs.getInt("feedback_id"),
+	        rs.getInt("booking_id"),
+	        rs.getInt("tutor_id"),
+	        tutorName,
+	        rs.getInt("rating"),
+	        rs.getString("comment"),
+	        rs.getTimestamp("created_at")
+	    );
+	}
+
 	
-    public Feedback addFeedback(Feedback feedback) {
+	public Feedback addFeedback(Feedback feedback) {
         String sql = "INSERT INTO feedback (booking_id, rating, comment, tutor_id) VALUES (?, ?, ?, ?)";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, feedback.getBookingID());
             statement.setInt(2, feedback.getRating());
             statement.setString(3, feedback.getComment());
@@ -122,5 +187,20 @@ public class FeedbackDAO {
             return false;
         }
     }
-	
+    
+	public double getAverageRating(int tutorID) {
+		String sql = "SELECT AVG(rating) FROM feedback WHERE tutor_id = ?";
+
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setInt(1, tutorID);
+
+			ResultSet rs = statement.executeQuery();
+			if (rs.next()) {
+				return rs.getDouble(1);
+			}
+		} catch (SQLException e) {
+			System.err.println("Failed to get feedback average: " + e.getMessage());
+		}
+		return 0;
+	}
 }

@@ -1,26 +1,34 @@
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadProfileServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoginServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\UserDAO.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Schedule.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Feedback.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadEditProfileServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadTutorProfileServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\ConfirmBookingServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Tutor.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Booking.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\ScheduleDAO.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadSearchTutorServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\SearchTutorServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\FeedbackDAO.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\User.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\RemoveLanguageServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\SubmitScheduleServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\BookingDAO.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\LanguageDAO.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\UpdateProfileServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LogoutServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadEditScheduleServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadBookTutorServlet.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\AppContextListener.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Language.java
-C:\Users\elias\Windsurf Projects\ToiTalk\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Student.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadEditProfileServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Feedback.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\ConfirmBookingServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LogoutServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\FeedbackDAO.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadRegisterServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Schedule.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\BookingDAO.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadProfileServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\SubmitScheduleServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\UpdateProfileServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadFeedbackServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Student.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Tutor.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\ScheduleDAO.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\RemoveLanguageServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\SearchTutorServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoginServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\LanguageDAO.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\ChangeBookingStatusServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadEditScheduleServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\SaveFeedbackServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\User.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadBookTutorServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\ViewBookingServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\CancelBookingServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadTutorProfileServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Language.java
+C:\Users\elias\git\ToiTalk\src\main\java\AddUsers.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\CreateUserServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\AppContextListener.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\DAO\UserDAO.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\controller\LoadSearchTutorServlet.java
+C:\Users\elias\git\ToiTalk\src\main\java\com\algonquin\ToiTalk\model\Booking.java

@@ -27,7 +27,7 @@
         <c:when test="${user.getType() == 'tutor'}">
             <p><strong>Bio:</strong> ${user.getBio()}</p>
 				<p><strong>Languages:</strong>
-				    <c:forEach var="lang" items="${user.languages}" varStatus="status">
+				    <c:forEach var="lang" items="${user.getLanguages()}" varStatus="status">
 				        ${lang.langName}<c:if test="${!status.last}">, </c:if>
 				    </c:forEach>
 				</p>

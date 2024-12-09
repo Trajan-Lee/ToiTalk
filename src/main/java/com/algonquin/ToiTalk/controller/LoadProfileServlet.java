@@ -1,6 +1,7 @@
 package com.algonquin.ToiTalk.controller;
 
 import com.algonquin.ToiTalk.model.User;
+import com.algonquin.ToiTalk.model.Student;
 import com.algonquin.ToiTalk.model.Tutor;
 
 import javax.servlet.ServletException;
@@ -25,6 +26,13 @@ public class LoadProfileServlet extends HttpServlet {
             return;
         }
         
+		if (user.getType().equals("tutor")) {
+			Tutor tutor = (Tutor) user;
+			request.setAttribute("user", tutor);
+		} else {
+			Student student = (Student) user;
+			request.setAttribute("user", student);
+		}
         // Forward to profile.jsp to display profile information
         request.getRequestDispatcher("/userProfile.jsp").forward(request, response);
     }

@@ -19,33 +19,38 @@ public class UserDAO {
 		this.connection = connection;
 	}
 	
-    public User validateUser(String email, String password) {
-        User user = null;
-        //join both student and tutor onto user
-        String sql = "SELECT * FROM users LEFT JOIN tutors "
-                    + "ON users.user_id = tutors.user_id "
-                    + "LEFT JOIN students ON users.user_id = students.user_id "
-                    + "WHERE email = ?";
-    
-        try (PreparedStatement statement = connection.prepareStatement(sql)){
-            statement.setString(1, email);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                user = loadUser(rs);
-                String hashedPassword = rs.getString("password");
-                // Verify the password using BCrypt
-                if (!BCrypt.checkpw(password, hashedPassword)) {
-                    return null; // Password doesn't match
-                }
-                // Clear any password from the user object for security
-                user.setPassword(null);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Could not load from SQL: USER DATA");
-        }
-        return user;
-    }
+	public User validateUser(String email, String password) {
+	    User user = null;
+	    String sql = "SELECT * FROM users LEFT JOIN tutors "
+	                + "ON users.user_id = tutors.user_id "
+	                + "LEFT JOIN students ON users.user_id = students.user_id "
+	                + "WHERE email = ?";
+
+	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+	        statement.setString(1, email);
+	        ResultSet rs = statement.executeQuery();
+	        if (rs.next()) {
+	            user = loadUser(rs);
+	            String hashedPassword = rs.getString("password");
+	            try {
+	                // Verify the password using BCrypt
+	                if (!BCrypt.checkpw(password, hashedPassword)) {
+	                    return null; // Password doesn't match
+	                }
+	            } catch (IllegalArgumentException e) {
+	                e.printStackTrace();
+	                System.out.println("Invalid salt version or other error in BCrypt.checkpw");
+	                return null; // Handle the error appropriately
+	            }
+	            // Clear any password from the user object for security
+	            user.setPassword(null);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        System.out.println("Could not load from SQL: USER DATA");
+	    }
+	    return user;
+	}
     
     public User loadUser(ResultSet rs) throws SQLException {
     	User user = null;
@@ -153,24 +158,31 @@ public class UserDAO {
                 // Insert into tutors table using the user_id and Tutor-specific details
                 tutorStmt.setInt(1, userId);
                 tutorStmt.setString(2, tutor.getBio());
-                tutorStmt.setFloat(3, tutor.getRating());
+                tutorStmt.setDouble(3, tutor.getRating());
                 tutorStmt.setInt(4, tutor.getExpYears());
                 
-                // Handle the languages (assuming LanguageDAO's updateTutorLanguage method updates the tutor's languages)
-                LanguageDAO languageDAO = new LanguageDAO(connection);
-                boolean languageSuccess = languageDAO.updateTutorLanguage(tutor);
-
-                if (languageSuccess) {
-                    // Insert tutor info into the tutors table
-                    tutorStmt.executeUpdate();
-                    // If tutor ID is generated, set it to the tutor object
-                    ResultSet generatedKeys = tutorStmt.getGeneratedKeys();
-                    if (generatedKeys.next()) {
-                        tutor.setTutorID(generatedKeys.getInt(1));
-                    } else {
-                        System.err.println("No tutor ID obtained.");
-                    }
+                // Insert tutor info into the tutors table
+                tutorStmt.executeUpdate();
+                // If tutor ID is generated, set it to the tutor object
+                ResultSet generatedKeys = tutorStmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                	System.out.println(generatedKeys.getInt(1));
+                    tutor.setTutorID(generatedKeys.getInt(1));
+                    // Handle the languages
+                    LanguageDAO languageDAO = new LanguageDAO(connection);
+                    boolean languageSuccess = languageDAO.updateTutorLanguage(tutor);
+                    // Create new blank schedule once tutor ID is obtained
+                    Schedule schedule = new Schedule(tutor.getTutorID(), null);
+                    tutor.setSchedule(schedule);
+                    //if language not properly set, reset tutorID to 0 to cause failure
+					if (languageSuccess == false) {
+						tutor.setTutorID(0);
+					}
+                } else {
+                    System.err.println("No tutor ID obtained.");
                 }
+            } else {
+            	System.err.println("No user ID obtained.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -179,8 +191,38 @@ public class UserDAO {
         tutor.setPassword(null);
         return tutor;
     }
+    
+    // Method to check if a username is already in use
+	public boolean isUsernameTaken(String username) {
+		String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, username);
+			ResultSet rs = statement.executeQuery();
+			if (rs.next()) {
+				return rs.getInt(1) > 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.err.println("Error checking username: " + e.getMessage());
+		}
+		return false;
+	}
 
-
+	// Method to check if an email is already in use
+	public boolean isEmailTaken(String email) {
+		String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setString(1, email);
+			ResultSet rs = statement.executeQuery();
+			if (rs.next()) {
+				return rs.getInt(1) > 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.err.println("Error checking email: " + e.getMessage());
+		}
+		return false;
+	}
     
     public boolean deleteStudent(int userId) {
         String sqlStudent = "DELETE FROM students WHERE user_id = ?";
@@ -422,7 +464,7 @@ public class UserDAO {
 
             // Update in tutors table
             tutorStmt.setString(1, tutor.getBio());
-            tutorStmt.setFloat(2, tutor.getRating());
+            tutorStmt.setDouble(2, tutor.getRating());
             tutorStmt.setInt(3, tutor.getExpYears());
             tutorStmt.setInt(4, tutor.getTutorID());
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -444,5 +486,19 @@ public class UserDAO {
 			e.printStackTrace();
 			return false;
 	    }
+	}
+    
+	public boolean setTutorRating(int tutorID, double rating) {
+		String sql = "UPDATE tutors SET rating = ? WHERE tutor_id = ?";
+
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setDouble(1, rating);
+			statement.setInt(2, tutorID);
+			statement.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

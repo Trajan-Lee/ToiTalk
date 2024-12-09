@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.algonquin.ToiTalk.model.Schedule;
@@ -46,6 +48,47 @@ public class ScheduleDAO {
 		return dayToIntMap.get(Day);
 	}
 	
+	public List<Schedule> getWeeklySchedules(Schedule schedule, int weeks) {
+		// ensure only 1-4 weeks are requested
+        if (weeks < 1 || weeks > 6) {
+            throw new IllegalArgumentException("Weeks must be between 1 and 4");
+        }
+
+        List<Schedule> weeklySchedules = new ArrayList<>();
+        int tutorID = schedule.getTutorID();
+        String[][] baseSchedule = schedule.getArrSchedule();
+        
+        //create deep copy of array
+        for (int week = 0; week < weeks; week++) {
+            String[][] weekSchedule = new String[7][24];
+            for (int day = 0; day < 7; day++) {
+                System.arraycopy(baseSchedule[day], 0, weekSchedule[day], 0, 24);
+            }
+            
+            // retrieve bookings for the week
+            String sql = "SELECT * FROM bookings WHERE tutor_id = ? AND WEEK(date) = WEEK(CURDATE()) + ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, tutorID);
+                statement.setInt(2, week);
+                ResultSet rs = statement.executeQuery();
+                
+                // remove bookings from schedule
+                while (rs.next()) {
+                    int bookingDay = rs.getTimestamp("date").toLocalDateTime().getDayOfWeek().getValue() - 1;
+                    int bookingHour = rs.getTimestamp("date").toLocalDateTime().getHour();
+                    weekSchedule[bookingDay][bookingHour] = null;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Could not load from SQL: BOOKING DATA");
+            }
+
+            weeklySchedules.add(new Schedule(tutorID, weekSchedule));
+        }
+
+        return weeklySchedules;
+    }
+	
 	public Schedule loadSchedule(int tutorID) {
 		String schedule[][] = new String[7][24];
 		
@@ -64,7 +107,7 @@ public class ScheduleDAO {
 			while (rs.next()) {
 				iDay = DayConverter(rs.getString("day"));
 				iHour = rs.getInt("hour");
-				sStatus = rs.getString("status");
+				sStatus = "Open";
 				schedule[iDay][iHour] = sStatus;
 			}
 		} catch (SQLException e) {
@@ -96,7 +139,7 @@ public class ScheduleDAO {
 	    String[][] inSchedule = schedule.getArrSchedule();
 	    int tutorID = schedule.getTutorID();
 
-	    String sql = "INSERT INTO tutor_schedule (tutor_id, slot_id, status) VALUES (?, ?, ?)";
+	    String sql = "INSERT INTO tutor_schedule (tutor_id, slot_id) VALUES (?, ?)";
 
 	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
 	        statement.setInt(1, tutorID);
@@ -107,7 +150,6 @@ public class ScheduleDAO {
 	                if (inSchedule[day][hour] != null) {
 	                    slotID = day * 24 + hour + 1;
 	                    statement.setInt(2, slotID);
-	                    statement.setString(3, inSchedule[day][hour]);
 	                    statement.addBatch(); // Add to batch instead of executing immediately
 	                }
 	            }
@@ -132,6 +174,9 @@ public class ScheduleDAO {
 		return slotID;
 	}
 	
+	/*  Depreciated for now. Status Not implemented in DB
+	 * 
+	 * 
 	public boolean changeScheduleStatus(int tutorID, int day, int hour, String status) {
 		
 		String sql = "UPDATE tutor_schedule"
@@ -168,5 +213,5 @@ public class ScheduleDAO {
 	    	return false;
 	    }
 	}
-	
+	*/
 }

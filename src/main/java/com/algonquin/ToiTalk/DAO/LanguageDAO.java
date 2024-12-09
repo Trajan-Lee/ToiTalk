@@ -41,6 +41,7 @@ public class LanguageDAO {
 	}
 	
 	public Language getLangByName(String langName) {
+		//LangName must be Capitalized on the first letter of each word, eg. "French", "Spanish"
 		Language lang = null;
 		String sql = "SELECT * "
 				+ "FROM languages "

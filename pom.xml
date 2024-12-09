@@ -41,6 +41,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-dbcp2</artifactId>
+		<version>2.9.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
       <version>5.1.6.RELEASE</version>
@@ -60,6 +65,19 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.3</version>
       </plugin>
+      <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.3.1</version>
+            <configuration>
+                <webResources>
+                    <resource>
+			            <directory>src/main/java</directory>
+			            <targetPath>SRC</targetPath>
+                    </resource>
+                </webResources>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
 </project>

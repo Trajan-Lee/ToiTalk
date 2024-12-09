@@ -1,15 +1,19 @@
 package com.algonquin.ToiTalk.controller;
 
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import com.algonquin.ToiTalk.DAO.LanguageDAO;
 import com.algonquin.ToiTalk.DAO.UserDAO;
 import com.algonquin.ToiTalk.model.User;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -21,36 +25,40 @@ import java.util.List;
 public class SearchTutorServlet extends HttpServlet {
 	UserDAO userDAO;
 	LanguageDAO langDAO;
-	private Connection connection;
-	
-	
-	@Override
-	public void init() throws ServletException {
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/toitalk", "user1", "password1");
-			this.userDAO = new UserDAO(connection);
-			this.langDAO = new LanguageDAO(connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-            throw new ServletException("MySQL JDBC Driver not found", e);
-        }
-	}
+    private DataSource dataSource;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String searchInput = request.getParameter("searchInput");
-        String searchType = request.getParameter("searchType");
-        List<String> allLangList = langDAO.listStrAllLang();
-        request.setAttribute("langList", allLangList);
-        boolean langYes = "language".equals(searchType); // true if searching by language
+    public void init() throws ServletException {
+        try {
+            // Initialize DataSource from JNDI
+            InitialContext ctx = new InitialContext();
+            dataSource = (DataSource) ctx.lookup("java:comp/env/jdbc/toitalk");
+        } catch (NamingException e) {
+            throw new ServletException("Cannot retrieve JNDI DataSource", e);
+        }
+    }
 
-        List<User> tutorResults = userDAO.searchTutorByNameOrLang(searchInput, langYes);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try (Connection connection = dataSource.getConnection()) {
+        	langDAO = new LanguageDAO(connection);
+        	userDAO = new UserDAO(connection);
 
-        request.setAttribute("tutorResults", tutorResults);
-        
-        request.getRequestDispatcher("searchTutor.jsp").forward(request, response);
+	        String searchInput = request.getParameter("searchInput");
+	        String searchType = request.getParameter("searchType");
+	    	//repopulate the language list
+	        List<String> arrList = langDAO.listStrAllLang();
+		     String json = new Gson().toJson(arrList);
+	    	request.setAttribute("allLang", json);
+	        boolean langYes = "language".equals(searchType); // true if searching by language
+	
+	        List<User> tutorResults = userDAO.searchTutorByNameOrLang(searchInput, langYes);
+	
+	        request.setAttribute("tutorResults", tutorResults);
+	        
+	        request.getRequestDispatcher("searchTutor.jsp").forward(request, response);
+		} catch (SQLException e) {
+			throw new ServletException("SQL error when searching for tutors", e);
+		}
     }
 }

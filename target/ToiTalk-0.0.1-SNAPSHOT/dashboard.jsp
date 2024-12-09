@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,12 +44,21 @@
         <!-- View Profile Button -->
         <button class="dashboard-btn" onclick="location.href='loadProfileServlet'">View Profile</button>
         
+		<!-- View Booking Button -->
+		<button class="dashboard-btn" onclick="location.href='viewBookingServlet'">View Booking</button>
+		        
         <!-- Search Tutors Button -->
-        <button class="dashboard-btn" onclick="location.href='loadSearchTutorServlet'">Search Tutors</button>
+        <c:if test="${user != null && user.type == 'student'}">
+            <button class="dashboard-btn" onclick="location.href='loadSearchTutorServlet'">Search Tutors</button>
+        </c:if>
         
-        <!-- Log-out Button -->
-        <button class="dashboard-btn" onclick="location.href='logoutServlet'">Log-out</button>
     </div>
+    <div>
+            <!-- Log-out Button -->
+        <button class="dashboard-btn" onclick="location.href='logoutServlet'">Log-out</button>
+        
+    </div>
+    
 
 </body>
 </html>
