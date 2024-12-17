@@ -8,38 +8,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<style>
-	    /* Style for the clickable tutor card */
-	    .tutor-card {
-	        display: block;
-	        padding: 15px;
-	        margin: 10px 0;
-	        border: 1px solid #ccc;
-	        border-radius: 8px;
-	        text-decoration: none;
-	        color: #333;
-	        background-color: #f9f9f9;
-	        transition: background-color 0.3s;
-	    }
-	
-	    .tutor-card:hover {
-	        background-color: #e0e0e0;
-	    }
-	
-	    .tutor-card h3 {
-	        margin: 0;
-	        font-size: 1.2em;
-	        color: #0056b3;
-	    }
-	
-	    .tutor-card p {
-	        margin: 4px 0;
-	        font-size: 1em;
-	        color: #555;
-	    }
-	</style>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Tutors</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="supplemental/styles.css">
     <script>
     // Convert the `allLang` JSON attribute from the server into a JavaScript array
 	const languages = JSON.parse('<c:out value="${allLang}" escapeXml="false" />');
@@ -77,62 +52,69 @@
         // Set common attributes for the new input element
         newInput.name = "searchInput";
         newInput.id = "searchInput";
+        newInput.className = "form-control bg-dark text-white w-50";
         newInput.required = true;
 
         // Append the new input element to the div searchBlock
         searchBlock.appendChild(newInput);
     }
 
-    </script>
+    function openNav() {
+        document.getElementById("Sidenav").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("Sidenav").style.width = "0";
+    }
+	</script>
 </head>
 <body>
-<h1>Search for Tutors</h1>
+<jsp:include page="supplemental/toolbar.jsp" />
 
-<form action="searchTutorServlet" id="searchForm" method="get">
-    <label for="searchType">Search by:</label>
-    <select name="searchType" id="searchType" onchange="toggleSearchInput()">
-        <option value="name">Name</option>
-        <option value="language">Language</option>
-    </select>
-	<div id="searchBlock">
-    	<input type="text" name="searchInput" id="searchInput" placeholder="Enter name" required style="display: block;">
-	</div>
+    <div class="main-card card-large">
+        <h2>Search for Tutors</h2>
+        <div class="card-body mb-3">
+            <form action="searchTutorServlet" id="searchForm" method="get">
+                <div class="mb-3">
+                    <label for="searchType" class="form-label">Search by:</label>
+                    <select name="searchType" id="searchType" class="form-control bg-dark text-white w-50" onchange="toggleSearchInput()">
+                        <option value="name">Name</option>
+                        <option value="language">Language</option>
+                    </select>
+                </div>
+                <div id="searchBlock" class="mb-3">
+                    <input type="text" name="searchInput" id="searchInput" class="form-control bg-dark text-white w-50" placeholder="Enter name" required>
+                </div>
+                <div id="searchButton" class="d-grid">
+                    <button type="submit" class="btn btn-primary text-white">Search</button>
+                </div>
+            </form>
+        </div>
 
-	<div id="searchButton">
-		<button type="submit">Search</button>
-	</div>
-
-</form>
-
-<c:if test="${not empty tutorResults}">
-    <ul>
-        <c:forEach var="tutor" items="${tutorResults}">
-            <div onclick="this.querySelector('form').submit();">
-                <!-- Form for POST request to tutorProfile.jsp -->
-                <form action="loadTutorProfileServlet" method="post" class="tutor-card">
-                    <!-- Hidden input field for tutor ID -->
-                    <input type="hidden" name="tutorId" value="${tutor.getTutorID()}" />
-                    
-                    <!-- Tutor details displayed within the card -->
-                    <div class="tutor-info">
-                        <h2>${tutor.getUsername()}</h2>
-                        <p>Languages: 
-                            <c:forEach var="lang" items="${tutor.getLanguages()}">
-                                ${lang.getLangName()}<c:if test="${not empty fn:escapeXml(lang.getLangName())}">, </c:if>
-                            </c:forEach>
-                        </p>
-                        <p>Rating: ${tutor.getRating()}</p>
-                        <p>Experience: ${tutor.getExpYears()} years</p>
-                    </div>
-                    <!-- Hidden submit button (no need to show this button since the div triggers submit) -->
-                    <button type="submit" style="display:none;">Go to Profile</button>
-                </form>
+        <c:if test="${not empty tutorResults}">
+            <div class="card-body">
+                <ul>
+                    <c:forEach var="tutor" items="${tutorResults}">
+                        <div onclick="this.querySelector('form').submit();">
+                            <form action="loadTutorProfileServlet" method="post" class="tutor-card">
+                                <input type="hidden" name="tutorId" value="${tutor.getTutorID()}" />
+                                <div class="tutor-info">
+                                    <h2>${tutor.getUsername()}</h2>
+                                    <p>Languages:
+                                        <c:forEach var="lang" items="${tutor.getLanguages()}">
+                                            ${lang.getLangName()}<c:if test="${not empty fn:escapeXml(lang.getLangName())}">, </c:if>
+                                        </c:forEach>
+                                    </p>
+                                    <p>Rating: ${tutor.getRating()}</p>
+                                    <p>Experience: ${tutor.getExpYears()} years</p>
+                                </div>
+                                <button type="submit" style="display:none;">Go to Profile</button>
+                            </form>
+                        </div>
+                    </c:forEach>
+                </ul>
             </div>
-        </c:forEach>
-    </ul>
-</c:if>
-
-
-
+        </c:if>
+    </div>
 </body>
 </html>

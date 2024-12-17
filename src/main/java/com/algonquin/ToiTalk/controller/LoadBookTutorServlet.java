@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @WebServlet("/loadBookTutorServlet")
@@ -146,7 +147,9 @@ public class LoadBookTutorServlet extends HttpServlet {
                 if (!currentDate.isAfter(today) || currentDate.isAfter(endDate)) {
                     dateArray[week][day] = "NA";
                 } else {
-                    dateArray[week][day] = currentDate.toString(); // Format as YYYY-MM-DD
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+                    String formattedDate = currentDate.format(formatter);
+                    dateArray[week][day] = formattedDate; // MM-DD
                 }
             }
         }

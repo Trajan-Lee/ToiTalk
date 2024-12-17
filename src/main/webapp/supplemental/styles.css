@@ -1,0 +1,207 @@
+@charset "UTF-8";
+/* General body styles */
+body {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0f0f0f; /* Dark background */
+}
+
+/* Brand title styling */
+.brand-title {
+    color: yellow;
+}
+
+.brand-subtitle {
+    color: red;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+/* Card styling */
+.main-card {
+    background-color: #212121; /* Darker card color */
+    color: #fff; /* White text */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); /* Subtle shadow */
+    padding: 2rem;
+    /* width to be set for each individual card */
+}
+
+/* Width-specific classes */
+.card-small {
+    width: 300px;
+}
+
+.card-medium {
+    width: 500px;
+}
+
+.card-large {
+    width: 700px;
+}
+.card-xlarge {
+	width: 900px;
+}
+
+/* Top bar styling */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #212121;
+    padding: 1rem;
+    color: white;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1;
+}
+
+.hamburger-menu {
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* Side navigation panel styling */
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: 
+#212121;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    z-index: 2;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.sidenav .btn {
+    background-color: #ff007f; /* Bright pink button */
+    border: none;
+    font-weight: bold;
+    display: block; /* Stack buttons vertically */
+    width: 100%; /* Make buttons full width */
+    text-align: left; /* Align text to the left */
+    padding: 10px 20px; /* Add padding for better appearance */
+    margin: 5px 0; /* Add margin between buttons */
+}
+
+.sidenav .btn:hover {
+    background-color: #e60072; /* Slightly darker pink on hover */
+}
+
+.card-body {
+    background-color: #333; /* Dark background for the card body */
+    color: #fff; /* White text */
+    padding: 1.5rem; /* Padding inside the card body */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+}
+
+.main-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+}
+
+.main-card .btn {
+    background-color: #ff007f; /* Bright pink button */
+    border: none;
+    font-weight: bold;
+}
+
+.main-card .btn:hover {
+    background-color: #e60072; /* Slightly darker pink on hover */
+}
+
+/* Links */
+.main-card a {
+    color: #ff007f; /* Pink links */
+    text-decoration: none;
+}
+
+.main-card a:hover {
+    text-decoration: underline;
+}
+
+.tutor-card {
+    background-color: #212121; /* Dark background */
+    color: #fff; /* White text */
+    padding: 1rem; /* Padding inside the card */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+    margin-bottom: 1rem; /* Space between cards */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: transform 0.2s; /* Smooth transform transition */
+}
+
+.tutor-card:hover {
+    transform: scale(1.02); /* Slightly enlarge on hover */
+}
+
+.tutor-card .tutor-info h2 {
+    margin: 0; /* Remove default margin */
+    font-size: 1.5rem; /* Font size for tutor name */
+}
+
+.tutor-card .tutor-info p {
+    margin: 0.5rem 0; /* Margin for paragraphs */
+}
+
+/* for register and edit profile */
+
+.language-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+.text-container {
+    flex-grow: 1;
+}
+
+.remove-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+
+

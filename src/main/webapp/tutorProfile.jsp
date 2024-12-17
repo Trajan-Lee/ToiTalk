@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
@@ -9,82 +9,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tutor Profile</title>
-    <style>
-        .profile-card {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            margin: 0 auto;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-card h2 {
-            text-align: center;
-        }
-
-        .profile-card .languages, .profile-card .bio, .profile-card .rating, .profile-card .experience {
-            margin-bottom: 10px;
-        }
-
-        .profile-card .languages span {
-            margin-right: 10px;
-        }
-
-        .book-btn {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        .book-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="supplemental/styles.css">
 </head>
 <body>
-	<c:if test="${not empty param.tutorId}">
-    	<c:set var="tutorId" value="${param.tutorId}" />
-	</c:if>
-    <div class="profile-card">
-        <h2>${tutor.getUsername()}</h2>
+<jsp:include page="supplemental/toolbar.jsp" />
+    <div class="main-card card-medium">
+        <h2 class="text-center mb-4"><span class="brand-title">Toi</span><span class="brand-subtitle">Talk</span></h2>
+        <h4 class="text-center mb-4">Tutor Profile</h4>
 
-        <!-- Display tutor's languages -->
-        <div class="languages">
-            <strong>Languages:</strong>
-            <c:forEach var="lang" items="${tutor.getLanguages()}">
-                <span>${lang.getLangName()}</span><c:if test="${not empty fn:escapeXml(lang.getLangName())}">, </c:if>
-            </c:forEach>
+        <div class="card-body">
+            <h2 class="text-center">${tutor.getUsername()}</h2>
+
+            <div class="mb-3">
+                <strong>Languages:</strong>
+                <c:forEach var="lang" items="${tutor.getLanguages()}">
+                    <span>${lang.getLangName()}</span><c:if test="${not empty fn:escapeXml(lang.getLangName())}">, </c:if>
+                </c:forEach>
+            </div>
+
+            <div class="mb-3">
+                <strong>Biography:</strong>
+                <p>${tutor.getBio()}</p>
+            </div>
+
+            <div class="mb-3">
+                <strong>Rating:</strong> ${tutor.getRating()} / 5
+            </div>
+
+            <div class="mb-3">
+                <strong>Years of Experience:</strong> ${tutor.getExpYears()} years
+            </div>
+
+            <form action="loadBookTutorServlet" method="POST" class="d-grid">
+                <input type="hidden" name="tutorId" value="${tutor.getTutorID()}">
+                <button type="submit" class="btn btn-primary text-white">Book a Session</button>
+            </form>
         </div>
-
-        <!-- Display tutor's bio -->
-        <div class="bio">
-            <strong>Biography:</strong>
-            <p>${tutor.getBio()}</p>
-        </div>
-
-        <!-- Display tutor's rating -->
-        <div class="rating">
-            <strong>Rating:</strong> ${tutor.getRating()} / 5
-        </div>
-
-        <!-- Display tutor's years of experience -->
-        <div class="experience">
-            <strong>Years of Experience:</strong> ${tutor.getExpYears()} years
-        </div>
-
-        <!-- Form to book a session with the tutor using POST -->
-        <form action="loadBookTutorServlet" method="POST">
-            <input type="hidden" name="tutorId" value="${tutor.getTutorID()}">
-            <button type="submit" class="book-btn">Book a Session</button>
-        </form>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
